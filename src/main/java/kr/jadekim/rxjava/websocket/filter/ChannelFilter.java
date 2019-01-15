@@ -6,11 +6,11 @@ import java.util.Map;
 public abstract class ChannelFilter {
 
     private final String channel;
-    private final Map<String, Object> parameters;
+    private final Map<String, Object> parameterMap;
 
-    public ChannelFilter(String channel, Map<String, Object> parameters) {
+    public ChannelFilter(String channel, Map<String, Object> parameterMap) {
         this.channel = channel;
-        this.parameters = Collections.unmodifiableMap(parameters);
+        this.parameterMap = Collections.unmodifiableMap(parameterMap);
     }
 
     public abstract boolean doFilter(String message, Object data);
@@ -19,7 +19,7 @@ public abstract class ChannelFilter {
         return channel;
     }
 
-    public Map<String, Object> getParameters() {
-        return parameters;
+    public Map<String, Object> getParameterMap() {
+        return parameterMap;
     }
 }

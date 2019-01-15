@@ -8,9 +8,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Channel {
+public @interface Automatic {
 
-    String value() default "";
-
-    Class<? extends ChannelFilter> filter() default BypassFilter.class;
+    String onSubscribe() default "";
 }
