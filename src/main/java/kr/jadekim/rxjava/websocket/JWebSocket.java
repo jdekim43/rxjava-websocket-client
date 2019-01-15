@@ -31,4 +31,33 @@ public class JWebSocket {
 
         return WebSocketClientProxy.create(webSocket, clazz);
     }
+
+    public static class Builder {
+
+        private ConnectionFactory connectionFactory;
+        private InboundParser parser;
+        private OutboundSerializer serializer;
+
+        public Builder connectionFactory(ConnectionFactory connectionFactory) {
+            this.connectionFactory = connectionFactory;
+
+            return this;
+        }
+
+        public Builder parser(InboundParser parser) {
+            this.parser = parser;
+
+            return this;
+        }
+
+        public Builder serializer(OutboundSerializer serializer) {
+            this.serializer = serializer;
+
+            return this;
+        }
+
+        public JWebSocket build() {
+            return new JWebSocket(connectionFactory, parser, serializer);
+        }
+    }
 }
