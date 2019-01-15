@@ -10,9 +10,9 @@ public class OkHttpConnectionFactory implements ConnectionFactory {
     private OkHttpClient okHttpClient;
     private Request baseRequest;
 
-    public OkHttpConnectionFactory(OkHttpClient okHttpClient, Request baseRequest) {
+    public OkHttpConnectionFactory(OkHttpClient okHttpClient) {
         this.okHttpClient = okHttpClient;
-        this.baseRequest = baseRequest;
+        this.baseRequest = new Request.Builder().url("").build();
     }
 
     @Override
