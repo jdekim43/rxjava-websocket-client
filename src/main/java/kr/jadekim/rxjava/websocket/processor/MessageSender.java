@@ -12,16 +12,17 @@ import kr.jadekim.rxjava.websocket.outbound.OutboundSerializer;
 import java.io.IOException;
 import java.util.Map;
 
-public class MessageSender {
+class MessageSender {
 
     private Connection connection;
     private OutboundSerializer serializer;
     private PublishSubject<MessageQueueItem> subject = PublishSubject.create();
 
-    public MessageSender(Connection connection, OutboundSerializer serializer) {
+    MessageSender(Connection connection, OutboundSerializer serializer) {
         this.connection = connection;
         this.serializer = serializer;
 
+        //noinspection ResultOfMethodCallIgnored
         subject
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(new Consumer<MessageQueueItem>() {
@@ -33,7 +34,7 @@ public class MessageSender {
                 });
     }
 
-    public Completable sendMessage(String messageType, Map<String, Object> parameterMap) {
+    Completable sendMessage(String messageType, Map<String, Object> parameterMap) {
         return Completable.create(new MessageQueueItem(messageType, parameterMap));
     }
 

@@ -12,13 +12,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StreamRouter {
+class StreamRouter {
 
     private InboundParser<Object> parser;
     private Observable<Inbound<Object>> mainStream;
     private Map<Integer, ChannelDistributor> distributorMap;
 
-    public StreamRouter(final InboundParser<Object> parser, Observable<String> inboundStream) {
+    StreamRouter(final InboundParser<Object> parser, Observable<String> inboundStream) {
         this.parser = parser;
 
         this.mainStream = inboundStream.map(new Function<String, Inbound<Object>>() {
@@ -33,7 +33,7 @@ public class StreamRouter {
     }
 
     @SuppressWarnings("unchecked")
-    public <Model> ChannelStream<Model> getStream(final String channel, final Type modelType, ChannelFilter filter) {
+    <Model> ChannelStream<Model> getStream(final String channel, final Type modelType, ChannelFilter filter) {
         final int key = Arrays.hashCode(new int[] {channel.hashCode(), modelType.hashCode()});
         ChannelDistributor<Model> distributor = distributorMap.get(key);
 

@@ -46,31 +46,7 @@ public final class WebSocketClientProxy implements InvocationHandler {
         Map<String, Object> parameterMap = getParameterMap(method.getParameterAnnotations(), args);
 
         if (method.isAnnotationPresent(Channel.class)) {
-            Channel channelInfo = method.getAnnotation(Channel.class);
-            String channel = channelInfo.value();
-            ChannelFilter filter = createChannelFilter(channel, channelInfo.filter(), parameterMap);
-
-            ChannelStream stream = io.getStream(channel, responseType, filter);
-
-            if (Observable.class.isAssignableFrom(rawType)) {
-                return stream.asObservable();
-            }
-
-            if (Flowable.class.isAssignableFrom(rawType)) {
-                return stream.asFlowable();
-            }
-
-            if (Single.class.isAssignableFrom(rawType)) {
-                return stream.asSingle();
-            }
-
-            if (Maybe.class.isAssignableFrom(rawType)) {
-                return stream.asMaybe();
-            }
-
-            if (Completable.class.isAssignableFrom(rawType)) {
-                return stream.asCompletable();
-            }
+            return processChannel(method.getAnnotation(Channel.class), parameterMap, rawType, responseType);
         } else if (method.isAnnotationPresent(Message.class)) {
             Completable sendCompletable = io.sendMessage(method.getAnnotation(Message.class).value(), parameterMap);
 
@@ -81,6 +57,35 @@ public final class WebSocketClientProxy implements InvocationHandler {
             sendCompletable.blockingAwait();
         } else if ("disconnect".equals(method.getName())) {
             io.disconnect();
+        }
+
+        return null;
+    }
+
+    private Object processChannel(Channel channelInfo, Map<String, Object> parameterMap, Class rawType, Type responseType) {
+        String channel = channelInfo.value();
+        ChannelFilter filter = createChannelFilter(channel, channelInfo.filter(), parameterMap);
+
+        ChannelStream stream = io.getStream(channel, responseType, filter);
+
+        if (rawType == Observable.class) {
+            return stream.asObservable();
+        }
+
+        if (rawType == Flowable.class) {
+            return stream.asFlowable();
+        }
+
+        if (rawType == Single.class) {
+            return stream.asSingle();
+        }
+
+        if (rawType == Maybe.class) {
+            return stream.asMaybe();
+        }
+
+        if (rawType == Completable.class) {
+            return stream.asCompletable();
         }
 
         return null;
