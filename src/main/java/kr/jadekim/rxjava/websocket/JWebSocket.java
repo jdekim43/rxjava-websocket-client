@@ -3,6 +3,7 @@ package kr.jadekim.rxjava.websocket;
 import kr.jadekim.rxjava.websocket.annotation.WebSocketClient;
 import kr.jadekim.rxjava.websocket.httpclient.Connection;
 import kr.jadekim.rxjava.websocket.httpclient.ConnectionFactory;
+import kr.jadekim.rxjava.websocket.httpclient.LazyConnectionFactory;
 import kr.jadekim.rxjava.websocket.inbound.InboundParser;
 import kr.jadekim.rxjava.websocket.outbound.OutboundSerializer;
 import kr.jadekim.rxjava.websocket.processor.WebSocket;
@@ -14,8 +15,8 @@ public class JWebSocket {
     private InboundParser parser;
     private OutboundSerializer serializer;
 
-    public JWebSocket(ConnectionFactory connectionFactory, InboundParser parser, OutboundSerializer serializer) {
-        this.connectionFactory = connectionFactory;
+    public JWebSocket(ConnectionFactory connectionFactory, InboundParser parser, OutboundSerializer serializer, boolean isLazy) {
+        this.connectionFactory = isLazy ? new LazyConnectionFactory(connectionFactory) : connectionFactory;
         this.parser = parser;
         this.serializer = serializer;
     }
@@ -40,6 +41,7 @@ public class JWebSocket {
         private ConnectionFactory connectionFactory;
         private InboundParser parser;
         private OutboundSerializer serializer;
+        private boolean isLazy = false;
 
         public Builder connectionFactory(ConnectionFactory connectionFactory) {
             this.connectionFactory = connectionFactory;
@@ -59,8 +61,14 @@ public class JWebSocket {
             return this;
         }
 
+        public Builder lazy(boolean enable) {
+            this.isLazy = enable;
+
+            return this;
+        }
+
         public JWebSocket build() {
-            return new JWebSocket(connectionFactory, parser, serializer);
+            return new JWebSocket(connectionFactory, parser, serializer, isLazy);
         }
     }
 }

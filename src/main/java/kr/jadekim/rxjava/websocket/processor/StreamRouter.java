@@ -21,20 +21,22 @@ class StreamRouter {
     StreamRouter(final InboundParser<Object> parser, Observable<String> inboundStream) {
         this.parser = parser;
 
-        this.mainStream = inboundStream.map(new Function<String, Inbound<Object>>() {
+        this.mainStream = inboundStream
+                .map(new Function<String, Inbound<Object>>() {
 
-            @Override
-            public Inbound<Object> apply(String s) throws Exception {
-                return parser.parse(s);
-            }
-        }).share();
+                    @Override
+                    public Inbound<Object> apply(String s) throws Exception {
+                        return parser.parse(s);
+                    }
+                })
+                .share();
 
         this.distributorMap = new HashMap<Integer, ChannelDistributor>();
     }
 
     @SuppressWarnings("unchecked")
     <Model> ChannelStream<Model> getStream(final String channel, final Type modelType, ChannelFilter filter) {
-        final int key = Arrays.hashCode(new int[] {channel.hashCode(), modelType.hashCode()});
+        final int key = Arrays.hashCode(new int[]{channel.hashCode(), modelType.hashCode()});
         ChannelDistributor<Model> distributor = distributorMap.get(key);
 
         if (distributor == null) {
@@ -52,8 +54,7 @@ class StreamRouter {
                         public Model apply(Inbound<Object> objectInbound) throws Exception {
                             return (Model) parser.mapping(objectInbound.getData(), modelType);
                         }
-                    })
-                    .share();
+                    });
 
             distributor = new ChannelDistributor<Model>(channel, stream);
             distributorMap.put(key, distributor);

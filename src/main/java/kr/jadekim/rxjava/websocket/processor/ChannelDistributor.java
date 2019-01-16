@@ -16,7 +16,7 @@ class ChannelDistributor<Model> {
 
     ChannelDistributor(String channel, Observable<Model> channelStream) {
         this.channel = channel;
-        this.channelStream = channelStream;
+        this.channelStream = channelStream.share();
         this.channelStreamMap = new HashMap<Integer, ChannelStream<Model>>();
     }
 
