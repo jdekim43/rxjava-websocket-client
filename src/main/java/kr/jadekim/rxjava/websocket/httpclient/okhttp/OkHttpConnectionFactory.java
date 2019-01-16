@@ -12,12 +12,12 @@ public class OkHttpConnectionFactory implements ConnectionFactory {
 
     public OkHttpConnectionFactory(OkHttpClient okHttpClient) {
         this.okHttpClient = okHttpClient;
-        this.baseRequest = new Request.Builder().url("").build();
     }
 
     @Override
     public Connection connect(String url) {
-        Request request = baseRequest.newBuilder().url(url).build();
+        Request.Builder builder = baseRequest == null ? new Request.Builder() : baseRequest.newBuilder();
+        Request request = builder.url(url).build();
 
         return new OkHttpConnection(okHttpClient, request).connect();
     }
