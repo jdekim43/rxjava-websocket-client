@@ -1,9 +1,7 @@
 package kr.jadekim.rxjava.websocket.processor;
 
 import io.reactivex.*;
-import kr.jadekim.rxjava.websocket.annotation.Channel;
-import kr.jadekim.rxjava.websocket.annotation.Message;
-import kr.jadekim.rxjava.websocket.annotation.Param;
+import kr.jadekim.rxjava.websocket.annotation.*;
 import kr.jadekim.rxjava.websocket.filter.ChannelFilter;
 
 import java.lang.annotation.Annotation;
@@ -44,6 +42,14 @@ public final class WebSocketClientProxy implements InvocationHandler {
         }
 
         Map<String, Object> parameterMap = getParameterMap(method.getParameterAnnotations(), args);
+
+        if (method.isAnnotationPresent(Params.class)) {
+            Params params = method.getAnnotation(Params.class);
+
+            for (Param param : params.value()) {
+                parameterMap.put(param.name(), param.value());
+            }
+        }
 
         if (method.isAnnotationPresent(Channel.class)) {
             return processChannel(method.getAnnotation(Channel.class), parameterMap, rawType, responseType);
@@ -103,8 +109,8 @@ public final class WebSocketClientProxy implements InvocationHandler {
             }
 
             for (Annotation annotation : annotations) {
-                if (annotation instanceof Param) {
-                    parameterMap.put(((Param) annotation).value(), args[i]);
+                if (annotation instanceof Name) {
+                    parameterMap.put(((Name) annotation).value(), args[i]);
                     break;
                 }
             }
