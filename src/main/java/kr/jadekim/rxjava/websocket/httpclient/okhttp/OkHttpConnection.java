@@ -1,18 +1,18 @@
 package kr.jadekim.rxjava.websocket.httpclient.okhttp;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import kr.jadekim.rxjava.websocket.httpclient.Connection;
 import okhttp3.*;
 import okio.ByteString;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
 
-public class OkHttpConnection extends WebSocketListener implements Connection, Publisher<String> {
+public class OkHttpConnection extends WebSocketListener implements Connection, ObservableOnSubscribe<String> {
 
     private OkHttpClient okHttpClient;
     private Request request;
     private WebSocket webSocket;
-    private Subscriber<? super String> subscriber;
+    private ObservableEmitter<String> emitter;
     private boolean isOpened = false;
 
     public OkHttpConnection(OkHttpClient okHttpClient, Request request) {
@@ -22,7 +22,7 @@ public class OkHttpConnection extends WebSocketListener implements Connection, P
 
     @Override
     public Observable<String> getInboundStream() {
-        return Observable.fromPublisher(this);
+        return Observable.create(this);
     }
 
     @Override
@@ -44,8 +44,8 @@ public class OkHttpConnection extends WebSocketListener implements Connection, P
     }
 
     @Override
-    public void subscribe(Subscriber<? super String> s) {
-        this.subscriber = s;
+    public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+        this.emitter = emitter;
     }
 
     @Override
@@ -55,7 +55,9 @@ public class OkHttpConnection extends WebSocketListener implements Connection, P
 
     @Override
     public void onMessage(WebSocket webSocket, String text) {
-        subscriber.onNext(text);
+        if (emitter != null) {
+            emitter.onNext(text);
+        }
     }
 
     @Override
@@ -71,12 +73,17 @@ public class OkHttpConnection extends WebSocketListener implements Connection, P
     @Override
     public void onClosed(WebSocket webSocket, int code, String reason) {
         this.isOpened = false;
-        subscriber.onComplete();
+
+        if (emitter != null) {
+            emitter.onComplete();
+        }
     }
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-        subscriber.onError(new OkHttpWebSocketException(t, response));
+        if (emitter != null) {
+            emitter.onError(new OkHttpWebSocketException(t, response));
+        }
     }
 
     public OkHttpConnection connect() {
