@@ -25,7 +25,10 @@ public class JWebSocket {
             return null;
         }
 
-        String url = clazz.getAnnotation(WebSocketClient.class).url();
+        return create(clazz, clazz.getAnnotation(WebSocketClient.class).url());
+    }
+
+    public <T> T create(Class<T> clazz, String url) {
         Connection connection = connectionFactory.connect(url);
         WebSocket webSocket = new WebSocket(connection, parser, serializer);
 
