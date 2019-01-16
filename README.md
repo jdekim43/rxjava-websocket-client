@@ -5,7 +5,7 @@
 * 자유로운 HttpClient : 모든 HttpClient 에서 동작할 수 있습니다. (Connection/ConnectionFactory 구현, OkHttp 는 OkHttpConnectionFactory 를 통해 바로 사용할 수 있습니다.)
 * 자유로운 메시지 형식 및 클래스 매핑 : json/xml/PlainString 등 자유로운 메시지 형식에 자유롭게 파서/매퍼를 설정할 수 있습니다. (InboundParser/OutboundSerializer 구현)
 * 하나의 Connection Inbound 스트림의 채널 및 커스텀 필터를 이용한 Observable 분리
-* 많은 요청 대비 Outbound 요청 queue 처리
+* LazyConnection : 구독하는 스트림이 있거나 sendMessage 요청시 WebSocket Connection 을 맺음 (모든 스트림이 dispose 되면 disconnect. 단, sendMessage 로 요청 후 dispose 되는 스트림이 없을 경우 disconnect 되지 않음.)
 
 
 ### 개발 예정
