@@ -8,6 +8,13 @@
 * 많은 요청 대비 Outbound 요청 queue 처리
 
 
+### 개발 예정
+* Connection 관리 개선
+* Message 유형 별 메소드 지정기능 추가 (messageType or 특정 메소드 설정)
+* Return Type 변환
+* channel 이벤트 핸들러 (onCreate/onNewObservable/onSubscribe/onUnsubscribe/onDestroy)
+
+
 ### 의존 라이브러리
 *  RxJava2
 
