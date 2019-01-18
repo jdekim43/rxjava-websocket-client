@@ -13,11 +13,13 @@ public class OkHttpConnection extends WebSocketListener implements Connection, O
     private Request request;
     private WebSocket webSocket;
     private ObservableEmitter<String> emitter;
+    private boolean isErrorPropagation;
     private boolean isOpened = false;
 
-    public OkHttpConnection(OkHttpClient okHttpClient, Request request) {
+    public OkHttpConnection(OkHttpClient okHttpClient, Request request, boolean isErrorPropagation) {
         this.okHttpClient = okHttpClient;
         this.request = request;
+        this.isErrorPropagation = isErrorPropagation;
     }
 
     @Override
@@ -81,7 +83,7 @@ public class OkHttpConnection extends WebSocketListener implements Connection, O
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-        if (emitter != null) {
+        if (isErrorPropagation && emitter != null) {
             emitter.onError(new OkHttpWebSocketException(t, response));
         }
     }

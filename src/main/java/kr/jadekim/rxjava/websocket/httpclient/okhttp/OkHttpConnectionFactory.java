@@ -15,11 +15,11 @@ public class OkHttpConnectionFactory implements ConnectionFactory {
     }
 
     @Override
-    public Connection connect(String url) {
+    public Connection connect(String url, boolean isErrorPropagation) {
         Request.Builder builder = baseRequest == null ? new Request.Builder() : baseRequest.newBuilder();
         Request request = builder.url(url).build();
 
-        return new OkHttpConnection(okHttpClient, request).connect();
+        return new OkHttpConnection(okHttpClient, request, isErrorPropagation).connect();
     }
 
     public void setBaseRequest(Request baseRequest) {

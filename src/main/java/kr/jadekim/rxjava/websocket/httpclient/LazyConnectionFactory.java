@@ -9,8 +9,8 @@ public class LazyConnectionFactory implements ConnectionFactory {
     }
 
     @Override
-    public Connection connect(String url) {
-        return new LazyConnection(originConnectionFactory, url);
+    public Connection connect(String url, boolean isErrorPropagation) {
+        return new LazyConnection(originConnectionFactory, url, isErrorPropagation);
     }
 
     public ConnectionFactory getOriginConnectionFactory() {

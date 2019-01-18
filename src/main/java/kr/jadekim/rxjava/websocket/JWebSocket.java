@@ -14,11 +14,13 @@ public class JWebSocket {
     private ConnectionFactory connectionFactory;
     private InboundParser parser;
     private OutboundSerializer serializer;
+    private boolean isErrorPropagation;
 
-    public JWebSocket(ConnectionFactory connectionFactory, InboundParser parser, OutboundSerializer serializer, boolean isLazy) {
+    public JWebSocket(ConnectionFactory connectionFactory, InboundParser parser, OutboundSerializer serializer, boolean isLazy, boolean isErrorPropagation) {
         this.connectionFactory = isLazy ? new LazyConnectionFactory(connectionFactory) : connectionFactory;
         this.parser = parser;
         this.serializer = serializer;
+        this.isErrorPropagation = isErrorPropagation;
     }
 
     public <T> T create(Class<T> clazz) {
@@ -30,7 +32,7 @@ public class JWebSocket {
     }
 
     public <T> T create(Class<T> clazz, String url) {
-        Connection connection = connectionFactory.connect(url);
+        Connection connection = connectionFactory.connect(url, isErrorPropagation);
         WebSocket webSocket = new WebSocket(connection, parser, serializer);
 
         return WebSocketClientProxy.create(webSocket, clazz);
@@ -42,6 +44,7 @@ public class JWebSocket {
         private InboundParser parser;
         private OutboundSerializer serializer;
         private boolean isLazy = false;
+        private boolean errorPropagation = true;
 
         public Builder connectionFactory(ConnectionFactory connectionFactory) {
             this.connectionFactory = connectionFactory;
@@ -67,8 +70,14 @@ public class JWebSocket {
             return this;
         }
 
+        public Builder errorPropagation(boolean enable) {
+            this.errorPropagation = enable;
+
+            return this;
+        }
+
         public JWebSocket build() {
-            return new JWebSocket(connectionFactory, parser, serializer, isLazy);
+            return new JWebSocket(connectionFactory, parser, serializer, isLazy, errorPropagation);
         }
     }
 }

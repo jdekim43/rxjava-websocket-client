@@ -10,13 +10,15 @@ public class LazyConnection implements Connection {
 
     private ConnectionFactory connectionFactory;
     private String url;
+    private boolean isErrorPropagation;
 
     private volatile Connection connection;
     private volatile Observable<String> stream;
 
-    public LazyConnection(ConnectionFactory connectionFactory, String url) {
+    public LazyConnection(ConnectionFactory connectionFactory, String url, boolean isErrorPropagation) {
         this.connectionFactory = connectionFactory;
         this.url = url;
+        this.isErrorPropagation = isErrorPropagation;
     }
 
     @Override
@@ -55,7 +57,7 @@ public class LazyConnection implements Connection {
 
     public synchronized Connection connect() {
         if (connection == null) {
-            connection = connectionFactory.connect(url);
+            connection = connectionFactory.connect(url, isErrorPropagation);
             stream = connection.getInboundStream()
                     .doFinally(new Action() {
                         @Override
