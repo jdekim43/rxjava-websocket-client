@@ -1,11 +1,14 @@
 package kr.jadekim.rxjava.websocket.processor;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import kr.jadekim.rxjava.websocket.filter.ChannelFilter;
 import kr.jadekim.rxjava.websocket.inbound.Inbound;
 import kr.jadekim.rxjava.websocket.inbound.InboundParser;
+import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -17,11 +20,30 @@ class StreamRouter {
     private InboundParser<Object> parser;
     private Observable<Inbound<Object>> mainStream;
     private Map<Integer, ChannelDistributor> distributorMap;
+    private WebSocketEventListener listener;
 
-    StreamRouter(final InboundParser<Object> parser, Observable<String> inboundStream) {
+    StreamRouter(final InboundParser<Object> parser, Observable<String> inboundStream, final WebSocketEventListener listener) {
         this.parser = parser;
 
         this.mainStream = inboundStream
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(Disposable disposable) throws Exception {
+                        listener.onStartInboundStream();
+                    }
+                })
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        listener.onErrorInboundStream(throwable);
+                    }
+                })
+                .doFinally(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        listener.onStopInboundStream();
+                    }
+                })
                 .map(new Function<String, Inbound<Object>>() {
 
                     @Override
@@ -32,31 +54,16 @@ class StreamRouter {
                 .share();
 
         this.distributorMap = new HashMap<Integer, ChannelDistributor>();
+        this.listener = listener;
     }
 
-    @SuppressWarnings("unchecked")
-    <Model> ChannelStream<Model> getStream(final String channel, final Type modelType, ChannelFilter filter) {
+    <Model> ChannelStream<Model> getStream(String channel, Type modelType, ChannelFilter filter) {
         final int key = Arrays.hashCode(new int[]{channel.hashCode(), modelType.hashCode()});
+        //noinspection unchecked
         ChannelDistributor<Model> distributor = distributorMap.get(key);
 
         if (distributor == null) {
-            Observable<Model> stream = mainStream
-                    .filter(new Predicate<Inbound<Object>>() {
-
-                        @Override
-                        public boolean test(Inbound<Object> objectInbound) throws Exception {
-                            return channel.trim().length() == 0 || objectInbound.getChannel().equals(channel);
-                        }
-                    })
-                    .map(new Function<Inbound<Object>, Model>() {
-
-                        @Override
-                        public Model apply(Inbound<Object> objectInbound) throws Exception {
-                            return (Model) parser.mapping(objectInbound.getData(), modelType);
-                        }
-                    });
-
-            distributor = new ChannelDistributor<Model>(channel, stream);
+            distributor = new ChannelDistributor<Model>(channel, mainStream, parser, modelType, listener);
             distributorMap.put(key, distributor);
         }
 

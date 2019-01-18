@@ -7,6 +7,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import kr.jadekim.rxjava.websocket.httpclient.Connection;
+import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 import kr.jadekim.rxjava.websocket.outbound.OutboundSerializer;
 
 import java.io.IOException;
@@ -16,11 +17,13 @@ class MessageSender {
 
     private Connection connection;
     private OutboundSerializer serializer;
+    private WebSocketEventListener listener;
     private PublishSubject<MessageQueueItem> subject = PublishSubject.create();
 
-    MessageSender(Connection connection, OutboundSerializer serializer) {
+    MessageSender(Connection connection, OutboundSerializer serializer, WebSocketEventListener listener) {
         this.connection = connection;
         this.serializer = serializer;
+        this.listener = listener;
 
         //noinspection ResultOfMethodCallIgnored
         subject
@@ -53,6 +56,7 @@ class MessageSender {
         @Override
         public void subscribe(CompletableEmitter emitter) throws Exception {
             this.emitter = emitter;
+            listener.onAddMessageQueue(messageType, parameterMap);
             subject.onNext(this);
         }
 
@@ -62,9 +66,12 @@ class MessageSender {
             }
 
             String message = serializer.serialize(messageType, parameterMap);
+            listener.onSendMessage(messageType, parameterMap, message);
             if (connection.sendMessage(message)) {
+                listener.onSendCompleteMessage(messageType, parameterMap, message);
                 emitter.onComplete();
             } else {
+                listener.onSendErrorMessage(messageType, parameterMap, message);
                 emitter.onError(new IOException("Fail to send message : " + message));
             }
         }

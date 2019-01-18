@@ -4,22 +4,32 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import kr.jadekim.rxjava.websocket.httpclient.Connection;
+import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 import okhttp3.*;
 import okio.ByteString;
 
 public class OkHttpConnection extends WebSocketListener implements Connection, ObservableOnSubscribe<String> {
 
+    private String url;
     private OkHttpClient okHttpClient;
     private Request request;
     private WebSocket webSocket;
     private ObservableEmitter<String> emitter;
     private boolean isErrorPropagation;
     private boolean isOpened = false;
+    private WebSocketEventListener listener;
 
-    public OkHttpConnection(OkHttpClient okHttpClient, Request request, boolean isErrorPropagation) {
+    public OkHttpConnection(String url, OkHttpClient okHttpClient, Request request, boolean isErrorPropagation, WebSocketEventListener listener) {
+        this.url = url;
         this.okHttpClient = okHttpClient;
         this.request = request;
         this.isErrorPropagation = isErrorPropagation;
+        this.listener = listener;
+    }
+
+    @Override
+    public String getUrl() {
+        return url;
     }
 
     @Override
@@ -53,6 +63,8 @@ public class OkHttpConnection extends WebSocketListener implements Connection, O
     @Override
     public void onOpen(WebSocket webSocket, Response response) {
         this.isOpened = true;
+
+        listener.onConnectedSocket(this);
     }
 
     @Override
@@ -69,7 +81,7 @@ public class OkHttpConnection extends WebSocketListener implements Connection, O
 
     @Override
     public void onClosing(WebSocket webSocket, int code, String reason) {
-        //do nothing
+        listener.onDisconnectSocket(this);
     }
 
     @Override
@@ -79,6 +91,8 @@ public class OkHttpConnection extends WebSocketListener implements Connection, O
         if (emitter != null) {
             emitter.onComplete();
         }
+
+        listener.onDisconnectedSocket(this);
     }
 
     @Override
@@ -88,12 +102,16 @@ public class OkHttpConnection extends WebSocketListener implements Connection, O
         if (isErrorPropagation && emitter != null) {
             emitter.onError(new OkHttpWebSocketException(t, response));
         }
+
+        listener.onErrorSocket(t);
     }
 
     public OkHttpConnection connect() {
         if (webSocket != null && isOpened) {
             throw new IllegalStateException("Another socket is connected");
         }
+
+        listener.onConnectSocket();
 
         this.webSocket = okHttpClient.newWebSocket(request, this);
 

@@ -5,9 +5,13 @@ import kr.jadekim.rxjava.websocket.httpclient.Connection;
 import kr.jadekim.rxjava.websocket.httpclient.ConnectionFactory;
 import kr.jadekim.rxjava.websocket.httpclient.LazyConnectionFactory;
 import kr.jadekim.rxjava.websocket.inbound.InboundParser;
+import kr.jadekim.rxjava.websocket.listener.SimpleWebSocketEventListener;
+import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 import kr.jadekim.rxjava.websocket.outbound.OutboundSerializer;
 import kr.jadekim.rxjava.websocket.processor.WebSocket;
 import kr.jadekim.rxjava.websocket.processor.WebSocketClientProxy;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class JWebSocket {
 
@@ -16,24 +20,48 @@ public class JWebSocket {
     private OutboundSerializer serializer;
     private boolean isErrorPropagation;
 
-    public JWebSocket(ConnectionFactory connectionFactory, InboundParser parser, OutboundSerializer serializer, boolean isLazy, boolean isErrorPropagation) {
-        this.connectionFactory = isLazy ? new LazyConnectionFactory(connectionFactory) : connectionFactory;
-        this.parser = parser;
-        this.serializer = serializer;
-        this.isErrorPropagation = isErrorPropagation;
+    private JWebSocket() {
     }
 
-    public <T> T create(Class<T> clazz) {
+    public static <T> T create(Class<T> clazz) {
         if (!clazz.isAnnotationPresent(WebSocketClient.class)) {
             return null;
         }
 
-        return create(clazz, clazz.getAnnotation(WebSocketClient.class).url());
+        WebSocketClient config = clazz.getAnnotation(WebSocketClient.class);
+
+        try {
+            return new Builder()
+                    .connectionFactory(config.connectionFactory().getConstructor().newInstance())
+                    .parser(config.parser().getConstructor().newInstance())
+                    .serializer(config.serializer().getConstructor().newInstance())
+                    .lazy(config.isLazy())
+                    .errorPropagation(config.isErrorPropagation())
+                    .build()
+                    .create(clazz, config.url(), config.listener().getConstructor().newInstance());
+        } catch (InstantiationException e) {
+            throw new IllegalArgumentException("Not Found Accessible Default Constructor");
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException("Not Found Accessible Default Constructor");
+        } catch (InvocationTargetException e) {
+            throw new IllegalArgumentException("Not Found Accessible Default Constructor");
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException("Not Found Accessible Default Constructor");
+        }
     }
 
     public <T> T create(Class<T> clazz, String url) {
-        Connection connection = connectionFactory.connect(url, isErrorPropagation);
-        WebSocket webSocket = new WebSocket(connection, parser, serializer);
+        return create(clazz, url, null);
+    }
+
+    public <T> T create(Class<T> clazz, String url, WebSocketEventListener listener) {
+        if (listener == null) {
+            listener = new SimpleWebSocketEventListener();
+        }
+
+        Connection connection = connectionFactory.connect(url, isErrorPropagation, listener);
+
+        WebSocket webSocket = new WebSocket(connection, parser, serializer, listener);
 
         return WebSocketClientProxy.create(webSocket, clazz);
     }
@@ -44,7 +72,7 @@ public class JWebSocket {
         private InboundParser parser;
         private OutboundSerializer serializer;
         private boolean isLazy = false;
-        private boolean errorPropagation = true;
+        private boolean isErrorPropagation = true;
 
         public Builder connectionFactory(ConnectionFactory connectionFactory) {
             this.connectionFactory = connectionFactory;
@@ -71,13 +99,20 @@ public class JWebSocket {
         }
 
         public Builder errorPropagation(boolean enable) {
-            this.errorPropagation = enable;
+            this.isErrorPropagation = enable;
 
             return this;
         }
 
         public JWebSocket build() {
-            return new JWebSocket(connectionFactory, parser, serializer, isLazy, errorPropagation);
+            JWebSocket webSocket = new JWebSocket();
+
+            webSocket.connectionFactory = isLazy ? new LazyConnectionFactory(connectionFactory) : connectionFactory;
+            webSocket.parser = parser;
+            webSocket.serializer = serializer;
+            webSocket.isErrorPropagation = isErrorPropagation;
+
+            return webSocket;
         }
     }
 }
