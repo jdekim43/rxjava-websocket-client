@@ -83,6 +83,8 @@ public class OkHttpConnection extends WebSocketListener implements Connection, O
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+        this.isOpened = false;
+
         if (isErrorPropagation && emitter != null) {
             emitter.onError(new OkHttpWebSocketException(t, response));
         }
@@ -90,7 +92,7 @@ public class OkHttpConnection extends WebSocketListener implements Connection, O
 
     public OkHttpConnection connect() {
         if (webSocket != null && isOpened) {
-            webSocket.close(1000, "Another socket is connected");
+            throw new IllegalStateException("Another socket is connected");
         }
 
         this.webSocket = okHttpClient.newWebSocket(request, this);
