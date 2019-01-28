@@ -1,13 +1,11 @@
 package kr.jadekim.rxjava.websocket.processor;
 
 import io.reactivex.Completable;
-import kr.jadekim.rxjava.websocket.filter.ChannelFilter;
 import kr.jadekim.rxjava.websocket.httpclient.Connection;
 import kr.jadekim.rxjava.websocket.inbound.InboundParser;
 import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 import kr.jadekim.rxjava.websocket.outbound.OutboundSerializer;
 
-import java.lang.reflect.Type;
 import java.util.Map;
 
 public class WebSocket {
@@ -29,8 +27,8 @@ public class WebSocket {
         this.listener = listener;
     }
 
-    public <Model> ChannelStream<Model> getStream(String channel, Type modelType, ChannelFilter filter) {
-        return router.getStream(channel, modelType, filter);
+    public <Model> ChannelStream<Model> getStream(Subscription subscription) {
+        return router.getStream(subscription);
     }
 
     public InboundParser getParser() {

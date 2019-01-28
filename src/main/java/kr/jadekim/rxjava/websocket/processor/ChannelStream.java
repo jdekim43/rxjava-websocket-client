@@ -13,8 +13,9 @@ public class ChannelStream<Model> {
     private String channel;
     private Observable<Model> stream;
 
-    public ChannelStream(final String channel, Observable<Model> stream, final ChannelFilter filter, final WebSocketEventListener listener) {
-        this.channel = channel;
+    public ChannelStream(Observable<Model> stream, final Subscription subscription, final WebSocketEventListener listener) {
+        this.channel = subscription.getChannel();
+        final ChannelFilter filter = subscription.createFilter();
         this.stream = stream
                 .filter(new Predicate<Model>() {
 
@@ -26,6 +27,7 @@ public class ChannelStream<Model> {
                 .doOnSubscribe(new Consumer<Disposable>() {
                     @Override
                     public void accept(Disposable disposable) throws Exception {
+                        subscription.runOnStart();
                         listener.onStartFilteredStream(channel, filter);
                     }
                 })
@@ -38,6 +40,7 @@ public class ChannelStream<Model> {
                 .doFinally(new Action() {
                     @Override
                     public void run() throws Exception {
+                        subscription.runOnStop();
                         listener.onStopFilteredStream(channel, filter);
                     }
                 })

@@ -6,11 +6,9 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
-import kr.jadekim.rxjava.websocket.filter.ChannelFilter;
 import kr.jadekim.rxjava.websocket.inbound.Inbound;
 import kr.jadekim.rxjava.websocket.inbound.InboundParser;
 import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
-import kr.jadekim.rxjava.websocket.util.Objects;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -18,13 +16,11 @@ import java.util.Map;
 
 class ChannelDistributor<Model> {
 
-    private String channel;
     private Observable<Model> channelStream;
     private Map<Integer, ChannelStream<Model>> channelStreamMap;
     private WebSocketEventListener listener;
 
     ChannelDistributor(final String channel, Observable<Inbound<Object>> mainStream, final InboundParser<Object> parser, final Type modelType, final WebSocketEventListener listener) {
-        this.channel = channel;
         this.channelStream = mainStream
                 .filter(new Predicate<Inbound<Object>>() {
 
@@ -64,12 +60,12 @@ class ChannelDistributor<Model> {
         this.listener = listener;
     }
 
-    ChannelStream<Model> getStream(ChannelFilter filter) {
-        final int key = Objects.hashCode(filter.getClass().getName().hashCode(), filter.getParameterMap().hashCode());
+    ChannelStream<Model> getStream(Subscription subscription) {
+        final int key = subscription.getStreamId();
         ChannelStream<Model> stream = channelStreamMap.get(key);
 
         if (stream == null) {
-            stream = new ChannelStream<Model>(channel, channelStream, filter, listener);
+            stream = new ChannelStream<Model>(channelStream, subscription, listener);
             channelStreamMap.put(key, stream);
         }
 

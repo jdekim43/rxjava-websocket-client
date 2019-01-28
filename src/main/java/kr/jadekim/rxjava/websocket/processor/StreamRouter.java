@@ -5,13 +5,11 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import kr.jadekim.rxjava.websocket.filter.ChannelFilter;
 import kr.jadekim.rxjava.websocket.inbound.Inbound;
 import kr.jadekim.rxjava.websocket.inbound.InboundParser;
 import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,8 +55,10 @@ class StreamRouter {
         this.listener = listener;
     }
 
-    <Model> ChannelStream<Model> getStream(String channel, Type modelType, ChannelFilter filter) {
-        final int key = Arrays.hashCode(new int[]{channel.hashCode(), modelType.hashCode()});
+    <Model> ChannelStream<Model> getStream(Subscription subscription) {
+        final String channel = subscription.getChannel();
+        final Type modelType = subscription.getResponseType();
+        final int key = subscription.getChannelId();
         //noinspection unchecked
         ChannelDistributor<Model> distributor = distributorMap.get(key);
 
@@ -67,6 +67,6 @@ class StreamRouter {
             distributorMap.put(key, distributor);
         }
 
-        return distributor.getStream(filter);
+        return distributor.getStream(subscription);
     }
 }

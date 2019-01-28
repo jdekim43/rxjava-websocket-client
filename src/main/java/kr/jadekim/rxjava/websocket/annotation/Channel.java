@@ -13,4 +13,8 @@ public @interface Channel {
     String value() default "";
 
     Class<? extends ChannelFilter> filter() default BypassFilter.class;
+
+    String onStart() default "";
+
+    String onStop() default "";
 }
