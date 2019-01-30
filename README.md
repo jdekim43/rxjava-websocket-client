@@ -24,13 +24,21 @@ public interface TestClient {
     Flowable<String> subscribeAll();
     
     @Channel(value="channel1", filter=RemainderFilter.class)
-    Observable<ResponseModel> subscribeChannel1(@Name("dividerValue") int dividerValue, @Name("remainderValue") int remainderValue);
+    Observable<ResponseModel> subscribeChannel1(@Name("dividerValue") int dividerValue,
+                                                @Name("remainderValue") int remainderValue);
     
-    @Channel(value="channel2", filter=RemainderFilter.class, onStart="requestNumber2(interval, start)", onStop="stopNumber2(interval, start)")
+    @Channel(
+        value="channel2",
+        filter=RemainderFilter.class,
+        onStart="requestNumber2(interval, start)",
+        onStop="stopNumber2(interval, start)"
+    )
     @Params(
         @Param(name="interval", value="1")
     )
-    Flowable<ResponseModel> subscribeChannel2(@Name("start") int start, @Name("dividerValue") int dividerValue, @Name("remainderValue") int remainderValue);
+    Flowable<ResponseModel> subscribeChannel2(@Name("start") int start,
+                                              @Name("dividerValue") int dividerValue,
+                                              @Name("remainderValue") int remainderValue);
     
     @Message
     Completable sendMessage(String message);
@@ -39,10 +47,12 @@ public interface TestClient {
     Completable requestNumber(@Name("interval") int interval);
     
     @Message("requestNumber")
-    Completable requestNumber2(@Name("interval") int interval, @Name("startNumber") int startNumber);
+    Completable requestNumber2(@Name("interval") int interval,
+                               @Name("startNumber") int startNumber);
     
     @Message("stopNumber")
-    Completable stopNumber2(@Name("interval") int interval, @Name("startNumber") int startNumber);
+    Completable stopNumber2(@Name("interval") int interval,
+                            @Name("startNumber") int startNumber);
     
     // 메소드 명을 'disconnect' 로 하고 인스턴스로 만들어 호출 시 웹소켓 연결을 끊음.
     void disconnect();
