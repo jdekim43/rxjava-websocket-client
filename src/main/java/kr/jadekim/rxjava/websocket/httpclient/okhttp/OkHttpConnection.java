@@ -53,6 +53,7 @@ public class OkHttpConnection extends WebSocketListener implements Connection, O
         }
 
         webSocket.close(1000, null);
+        webSocket = null;
     }
 
     @Override
@@ -104,6 +105,12 @@ public class OkHttpConnection extends WebSocketListener implements Connection, O
         }
 
         listener.onErrorSocket(t);
+
+        if (!isErrorPropagation) {
+            listener.onDisconnectSocket(this);
+            disconnect();
+            listener.onDisconnectedSocket(this);
+        }
     }
 
     public OkHttpConnection connect() {
