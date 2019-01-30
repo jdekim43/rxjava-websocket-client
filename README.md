@@ -7,10 +7,6 @@
 * 하나의 Connection Inbound 스트림의 채널 및 커스텀 필터를 이용한 Observable 분리
 * LazyConnection : 구독하는 스트림이 있거나 sendMessage 요청시 WebSocket Connection 을 맺음 (모든 스트림이 dispose 되면 disconnect. 단, sendMessage 로 요청 후 dispose 되는 스트림이 없을 경우 disconnect 되지 않음.)
 
-### 개발 예정
-* Message 유형 별 메소드 지정기능 추가 (messageType or 특정 메소드 설정)
-* Return Type 변환
-
 
 ### 의존 라이브러리
 *  RxJava2
