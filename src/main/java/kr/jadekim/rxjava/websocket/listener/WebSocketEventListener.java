@@ -49,7 +49,7 @@ public interface WebSocketEventListener {
 
     void onSendMessage(String messageType, Map<String, Object> parameterMap, String message);
 
-    void onSendCompleteMessage(String messageType, Map<String, Object> parameterMap, String message);
+    void onCompleteSendMessage(String messageType, Map<String, Object> parameterMap, String message);
 
-    void onSendErrorMessage(String messageType, Map<String, Object> parameterMap, String message);
+    void onErrorSendMessage(String messageType, Map<String, Object> parameterMap, String message);
 }

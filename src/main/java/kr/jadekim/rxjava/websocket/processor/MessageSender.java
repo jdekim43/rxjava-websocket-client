@@ -68,10 +68,10 @@ class MessageSender {
             String message = serializer.serialize(messageType, parameterMap);
             listener.onSendMessage(messageType, parameterMap, message);
             if (connection.sendMessage(message)) {
-                listener.onSendCompleteMessage(messageType, parameterMap, message);
+                listener.onCompleteSendMessage(messageType, parameterMap, message);
                 emitter.onComplete();
             } else {
-                listener.onSendErrorMessage(messageType, parameterMap, message);
+                listener.onErrorSendMessage(messageType, parameterMap, message);
                 emitter.onError(new IOException("Fail to send message : " + message));
             }
         }

@@ -98,12 +98,12 @@ public class SimpleWebSocketEventListener implements WebSocketEventListener {
     }
 
     @Override
-    public void onSendCompleteMessage(String messageType, Map<String, Object> parameterMap, String message) {
+    public void onCompleteSendMessage(String messageType, Map<String, Object> parameterMap, String message) {
         //do nothing
     }
 
     @Override
-    public void onSendErrorMessage(String messageType, Map<String, Object> parameterMap, String message) {
+    public void onErrorSendMessage(String messageType, Map<String, Object> parameterMap, String message) {
         //do nothing
     }
 }
