@@ -1,4 +1,5 @@
 # rxjava-websocket-client
+[ ![Download](https://api.bintray.com/packages/jdekim43/maven/rxjava-websocket-client/images/download.svg?version=0.0.1) ](https://bintray.com/jdekim43/maven/rxjava-websocket-client/0.0.1/link)
 
 
 ### 주요기능
@@ -14,7 +15,21 @@
 
 ### 사용방법
 ##### 설치
-maven/gradle 추후 지원 예정
+##### maven
+```
+<dependency>
+  <groupId>kr.jadekim.rxjava</groupId>
+  <artifactId>rxjava-websocket-client</artifactId>
+  <version>0.0.1</version>
+  <type>pom</type>
+</dependency>
+```
+##### gradle
+```
+compile "kr.jadekim.rxjava:rxjava-websocket-client:$version"
+or
+implementation "kr.jadekim.rxjava:rxjava-websocket-client:$version"
+```
 
 ##### 인터페이스 정의
 ```

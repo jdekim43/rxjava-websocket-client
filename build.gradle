@@ -1,8 +1,17 @@
-plugins {
-    id 'java'
+buildscript {
+    repositories {
+        jcenter()
+    }
 }
 
-group 'kr.jadekim'
+plugins {
+    id "java"
+    id 'maven'
+    id 'maven-publish'
+    id "com.jfrog.bintray" version "1.8.4"
+}
+
+group 'kr.jadekim.rxjava'
 version '0.0.1'
 
 sourceCompatibility = 1.6
@@ -11,9 +20,73 @@ repositories {
     mavenCentral()
 }
 
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
 dependencies {
     implementation "io.reactivex.rxjava2:rxjava:2.2.4"
 
     compileOnly 'com.squareup.okhttp3:okhttp:3.12.0'
     compileOnly 'com.google.code.gson:gson:2.8.5'
+}
+
+publishing {
+    publications {
+        RxJavaWebSocketClient(MavenPublication) {
+            from components.java
+            groupId this.group
+            artifactId 'rxjava-websocket-client'
+            artifact sourcesJar
+            artifact javadocJar
+            version this.version
+            pom {
+                name = "RxJava WebSocket Client"
+                description = "WebSocket Client with RxJava"
+                url = "https://github.com/jdekim43/rxjava-websocket-client"
+                developers {
+                    developer {
+                        id = "jdekim43"
+                        name = "JinYong Kim"
+                        email = "jinyong@jadekim.kr"
+                    }
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    dryRun = false
+    publish = true
+    override = true
+    publications = ['RxJavaWebSocketClient']
+    pkg {
+        repo = 'maven'
+        name = 'rxjava-websocket-client'
+        userOrg = 'jdekim43'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/jdekim43/rxjava-websocket-client.git'
+        version {
+            name = this.version
+            desc = 'WebSocket Client for RxJava2'
+            released = new Date()
+            vcsTag = this.version
+            attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
+        }
+    }
+}
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
 }
