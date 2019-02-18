@@ -1,7 +1,7 @@
-package kr.jadekim.rxjava.websocket.httpclient.okhttp;
+package kr.jadekim.rxjava.websocket.connection.okhttp;
 
-import kr.jadekim.rxjava.websocket.httpclient.Connection;
-import kr.jadekim.rxjava.websocket.httpclient.ConnectionFactory;
+import kr.jadekim.rxjava.websocket.connection.Connection;
+import kr.jadekim.rxjava.websocket.connection.ConnectionFactory;
 import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -10,6 +10,10 @@ public class OkHttpConnectionFactory implements ConnectionFactory {
 
     private OkHttpClient okHttpClient;
     private Request baseRequest;
+
+    public OkHttpConnectionFactory() {
+        this.okHttpClient = new OkHttpClient.Builder().build();
+    }
 
     public OkHttpConnectionFactory(OkHttpClient okHttpClient) {
         this.okHttpClient = okHttpClient;

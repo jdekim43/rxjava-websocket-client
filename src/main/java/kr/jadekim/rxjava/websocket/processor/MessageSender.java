@@ -6,7 +6,7 @@ import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
-import kr.jadekim.rxjava.websocket.httpclient.Connection;
+import kr.jadekim.rxjava.websocket.connection.Connection;
 import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 import kr.jadekim.rxjava.websocket.outbound.OutboundSerializer;
 

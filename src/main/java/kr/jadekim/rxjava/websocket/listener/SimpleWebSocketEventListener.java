@@ -1,7 +1,7 @@
 package kr.jadekim.rxjava.websocket.listener;
 
 import kr.jadekim.rxjava.websocket.filter.ChannelFilter;
-import kr.jadekim.rxjava.websocket.httpclient.Connection;
+import kr.jadekim.rxjava.websocket.connection.Connection;
 
 import java.util.Map;
 

@@ -1,9 +1,9 @@
-package kr.jadekim.rxjava.websocket.httpclient.okhttp;
+package kr.jadekim.rxjava.websocket.connection.okhttp;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import kr.jadekim.rxjava.websocket.httpclient.Connection;
+import kr.jadekim.rxjava.websocket.connection.Connection;
 import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 import okhttp3.*;
 import okio.ByteString;

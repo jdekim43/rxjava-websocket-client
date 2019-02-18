@@ -1,9 +1,9 @@
 package kr.jadekim.rxjava.websocket;
 
 import kr.jadekim.rxjava.websocket.annotation.WebSocketClient;
-import kr.jadekim.rxjava.websocket.httpclient.Connection;
-import kr.jadekim.rxjava.websocket.httpclient.ConnectionFactory;
-import kr.jadekim.rxjava.websocket.httpclient.LazyConnectionFactory;
+import kr.jadekim.rxjava.websocket.connection.Connection;
+import kr.jadekim.rxjava.websocket.connection.ConnectionFactory;
+import kr.jadekim.rxjava.websocket.connection.LazyConnectionFactory;
 import kr.jadekim.rxjava.websocket.inbound.InboundParser;
 import kr.jadekim.rxjava.websocket.listener.SimpleWebSocketEventListener;
 import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;

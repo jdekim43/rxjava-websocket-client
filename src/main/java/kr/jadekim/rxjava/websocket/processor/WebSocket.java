@@ -1,7 +1,7 @@
 package kr.jadekim.rxjava.websocket.processor;
 
 import io.reactivex.Completable;
-import kr.jadekim.rxjava.websocket.httpclient.Connection;
+import kr.jadekim.rxjava.websocket.connection.Connection;
 import kr.jadekim.rxjava.websocket.inbound.InboundParser;
 import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 import kr.jadekim.rxjava.websocket.outbound.OutboundSerializer;

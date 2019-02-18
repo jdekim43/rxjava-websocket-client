@@ -1,7 +1,7 @@
 package kr.jadekim.rxjava.websocket.annotation;
 
-import kr.jadekim.rxjava.websocket.httpclient.ConnectionFactory;
-import kr.jadekim.rxjava.websocket.httpclient.okhttp.OkHttpConnectionFactory;
+import kr.jadekim.rxjava.websocket.connection.ConnectionFactory;
+import kr.jadekim.rxjava.websocket.connection.okhttp.OkHttpConnectionFactory;
 import kr.jadekim.rxjava.websocket.inbound.DefaultInboundParser;
 import kr.jadekim.rxjava.websocket.inbound.InboundParser;
 import kr.jadekim.rxjava.websocket.listener.SimpleWebSocketEventListener;

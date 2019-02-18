@@ -1,4 +1,4 @@
-package kr.jadekim.rxjava.websocket.httpclient;
+package kr.jadekim.rxjava.websocket.connection;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
