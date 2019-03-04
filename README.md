@@ -2,36 +2,30 @@
 [ ![Download](https://api.bintray.com/packages/jdekim43/maven/rxjava-websocket-client/images/download.svg?version=0.0.1) ](https://bintray.com/jdekim43/maven/rxjava-websocket-client/0.0.1/link)
 
 
-### 주요기능
-* 자유로운 HttpClient : 모든 HttpClient 에서 동작할 수 있습니다. (Connection/ConnectionFactory 구현, OkHttp 는 OkHttpConnectionFactory 를 통해 바로 사용할 수 있습니다.)
-* 자유로운 메시지 형식 및 클래스 매핑 : json/xml/PlainString 등 자유로운 메시지 형식에 자유롭게 파서/매퍼를 설정할 수 있습니다. (InboundParser/OutboundSerializer 구현)
-* 하나의 Connection Inbound 스트림의 채널 및 커스텀 필터를 이용한 Observable 분리
-* LazyConnection : 구독하는 스트림이 있거나 sendMessage 요청시 WebSocket Connection 을 맺음 (모든 스트림이 dispose 되면 disconnect. 단, sendMessage 로 요청 후 dispose 되는 스트림이 없을 경우 disconnect 되지 않음.)
+### Features
+* Usable any TCP Client : OkHttp, etc...  
+&nbsp;&nbsp;&nbsp;&nbsp; OkHttp is implemented
+* Acceptable any message type based on String : JSON, XML, TEXT  
+&nbsp;&nbsp;&nbsp;&nbsp; Implementation of InboundParser and OutboundSerializer is required.
+* Fabricable 'Observable' which makes 'received message' events you need by using channel and filters.
 
 
-### 의존 라이브러리
-*  RxJava2
+### Dependency
+* RxJava2
+* OkHttp (Optional)
 
 
-### 사용방법
-##### 설치
-##### maven
-```
-<dependency>
-  <groupId>kr.jadekim.rxjava</groupId>
-  <artifactId>rxjava-websocket-client</artifactId>
-  <version>0.0.1</version>
-  <type>pom</type>
-</dependency>
-```
-##### gradle
+### Install
 ```
 compile "kr.jadekim.rxjava:rxjava-websocket-client:$version"
-or
+
+//or
+
 implementation "kr.jadekim.rxjava:rxjava-websocket-client:$version"
 ```
 
-##### 인터페이스 정의
+### Define client interface
+#### Use builder class
 ```
 public interface TestClient {
     
@@ -69,18 +63,68 @@ public interface TestClient {
     Completable stopNumber2(@Name("interval") int interval,
                             @Name("startNumber") int startNumber);
     
-    // 메소드 명을 'disconnect' 로 하고 인스턴스로 만들어 호출 시 웹소켓 연결을 끊음.
+    // If method name is 'disconnect', it will be working 'disconnect' action
     void disconnect();
 }
 ```
+```
+JWebSocket webSocketClientFactory = new JWebSocket.Builder().build();
+TestClient client = webSocketClientFactory.create(TestClient.class, "ws://localhost/ws");
+client.subscribeAll().subscribe(msg -> System.out.println(msg));
+```
 
-##### ConnectionFactory 생성
+#### Use annotation
+```
+@WebSocketClient(
+    url = "wss://echo.websocket.org"
+)
+public interface TestClient {...}
+
+TestClient client = JWebSocket.create(TestClient.class);
+```
+
+
+### Customize
+#### Customize ConnectionFactory (Customize TCP Client)
+```
+public class OkHttpConnectionFactory implements ConnectionFactory {
+    ...
+    public OkHttpConnectionFactory(OkHttpClient okHttpClient) {
+        ...
+    }
+    
+    @Override
+    public Connection connect(String url, boolean isErrorPropagation, WebSocketEventListener listener) {
+        ...
+    }
+}
+```
 ```
 OkHttpClient httpClient = new OkHttpClient();
 ConnectionFactory connectionFactory = new OkHttpConnectionFactory(httpClient);
 ```
 
-##### Parser/Serialiser 구현
+#### Customize Inbound Message Parser
+```
+public abstract class GsonInboundParser implements InboundParser<JsonElement> {
+    ...
+    public GsonInboundParser(Gson gson) {
+        ...
+    }
+    
+    public abstract String getChannelName(JsonElement data);
+    
+    @Override
+    public Inbound<JsonElement> parse(String message) {
+        ...
+    }
+    
+    @Override
+    public <Model> Model mapping(JsonElement object, Type modelType) {
+        ...
+    }
+}
+```
 ```
 Gson gson = new Gson();
 
@@ -88,15 +132,32 @@ InboundParser parser = new GsonInboundParser(gson) {
 
     @Override
     public String getChannelName(JsonElement data) {
-        return object.getAsJsonObject().get("channel").getAsString(); 
+        return data.getAsJsonObject().get("channel").getAsString(); 
     }
 };
+```
 
+#### Customize Outbound Message Serializer
+```
+public class GsonOutboundSerializer implements OutboundSerializer {
+    ...
+    public GsonOutboundSerializer(Gson gson) {
+        ...
+    }
 
+    @Override
+    public String serialize(String messageType, Map<String, Object> parameterMap) {
+        ...
+    }
+}
+```
+```
+Gson gson = new Gson();
 OutboundSerializer serializer = new GsonOutboundSerializer(gson);
 ```
 
-##### WebSocketClient 인스턴스 생성
+### Configuration
+#### Use builder class
 ```
 JWebSocket webSocketClientFactory = new JWebSocket.Builder()
                 .connectionFactory(connectionFactory)
@@ -109,7 +170,7 @@ JWebSocket webSocketClientFactory = new JWebSocket.Builder()
 TestClient client = webSocketClientFactory.create(TestClient.class, "ws://localhost/ws");
 ```
 
-##### Annotation 으로 WebSocketClient 설정
+#### Use annotation
 ```
 @WebSocketClient(
     url = "wss://echo.websocket.org",
@@ -125,6 +186,15 @@ public interface TestClient {...}
 TestClient client = JWebSocket.create(TestClient.class);
 ```
 
+#### Lazy (default : false)
+When this option is enabled, the 'ConnectionFactory' specified by the user is wrapped in 'LazyConnectionFactory'.
+'LazyConnection' created by 'LazyConnectionFactory' automatically terminates the connection when there is no 'Observable' subscribing to the connection.
+And if the 'sendMessage' method is called, or if there is one or more subscription 'Observable', it automatically creates a connection.
 
-### 스트림 데이터 플로우 및 이벤트 시점
+#### Error propagation (default : true)
+This option allows you to set whether or not to notify 'Observable' of errors that occur on the connection.
+'Observable' in 'RxJava' will automatically terminate the stream when 'onError' is called.
+If you want to restore the connection and re-use 'Observable', disable this option.
+
+### Inbound message flow chart and event timing
 ![DataFlow](./data-flow.png?raw=true "DataFlow")
