@@ -3,7 +3,7 @@
 
 
 ### Features
-* Usable any TCP Client : OkHttp, etc...  
+* Usable any (real connection) Client : OkHttp, etc...  
 &nbsp;&nbsp;&nbsp;&nbsp; OkHttp is implemented
 * Acceptable any message type based on String : JSON, XML, TEXT  
 &nbsp;&nbsp;&nbsp;&nbsp; Implementation of InboundParser and OutboundSerializer is required.
@@ -85,7 +85,7 @@ TestClient client = JWebSocket.create(TestClient.class);
 
 
 ### Customize
-#### Customize ConnectionFactory (Customize TCP Client)
+#### Customize ConnectionFactory (Customize real connection Client)
 ```
 public class OkHttpConnectionFactory implements ConnectionFactory {
     ...
