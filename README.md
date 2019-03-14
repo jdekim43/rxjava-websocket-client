@@ -195,6 +195,3 @@ And if the 'sendMessage' method is called, or if there is one or more subscripti
 This option allows you to set whether or not to notify 'Observable' of errors that occur on the connection.
 'Observable' in 'RxJava' will automatically terminate the stream when 'onError' is called.
 If you want to restore the connection and re-use 'Observable', disable this option.
-
-### Inbound message flow chart and event timing
-![DataFlow](./data-flow.png?raw=true "DataFlow")
