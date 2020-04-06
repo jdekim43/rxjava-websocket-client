@@ -1,8 +1,9 @@
 package kr.jadekim.rxjava.websocket.connection;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.functions.Action;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.functions.Action;
+import io.reactivex.rxjava3.functions.Supplier;
 import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 
 import java.util.concurrent.Callable;
@@ -31,14 +32,12 @@ public class LazyConnection implements Connection {
 
     @Override
     public Observable<String> getInboundStream() {
-        return Observable.defer(new Callable<ObservableSource<String>>() {
-
+        return Observable.defer(new Supplier<ObservableSource<? extends String>>() {
             @Override
-            public ObservableSource<String> call() throws Exception {
+            public ObservableSource<? extends String> get() throws Throwable {
                 if (connection == null) {
                     connect();
                 }
-
                 return stream;
             }
         });

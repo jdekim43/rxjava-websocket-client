@@ -1,6 +1,6 @@
 package kr.jadekim.rxjava.websocket.connection;
 
-import io.reactivex.Observable;
+import io.reactivex.rxjava3.core.Observable;
 
 public interface Connection {
 

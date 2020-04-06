@@ -1,11 +1,11 @@
 package kr.jadekim.rxjava.websocket.processor;
 
-import io.reactivex.Completable;
-import io.reactivex.CompletableEmitter;
-import io.reactivex.CompletableOnSubscribe;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.CompletableEmitter;
+import io.reactivex.rxjava3.core.CompletableOnSubscribe;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 import kr.jadekim.rxjava.websocket.connection.Connection;
 import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 import kr.jadekim.rxjava.websocket.outbound.OutboundSerializer;
