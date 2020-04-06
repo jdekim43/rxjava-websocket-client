@@ -1,6 +1,6 @@
 package kr.jadekim.rxjava.websocket.processor;
 
-import io.reactivex.Completable;
+import io.reactivex.rxjava3.core.Completable;
 import kr.jadekim.rxjava.websocket.connection.Connection;
 import kr.jadekim.rxjava.websocket.inbound.InboundParser;
 import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;

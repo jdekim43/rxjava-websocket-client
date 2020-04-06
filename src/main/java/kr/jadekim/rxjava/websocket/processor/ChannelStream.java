@@ -1,10 +1,10 @@
 package kr.jadekim.rxjava.websocket.processor;
 
-import io.reactivex.*;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Predicate;
+import io.reactivex.rxjava3.core.*;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Action;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.functions.Predicate;
 import kr.jadekim.rxjava.websocket.filter.ChannelFilter;
 import kr.jadekim.rxjava.websocket.listener.WebSocketEventListener;
 

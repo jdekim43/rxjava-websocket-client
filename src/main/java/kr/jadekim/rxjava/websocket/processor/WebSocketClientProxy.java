@@ -1,6 +1,6 @@
 package kr.jadekim.rxjava.websocket.processor;
 
-import io.reactivex.*;
+import io.reactivex.rxjava3.core.*;
 import kr.jadekim.rxjava.websocket.annotation.*;
 
 import java.lang.annotation.Annotation;
@@ -58,7 +58,7 @@ public final class WebSocketClientProxy implements InvocationHandler {
         Matcher matcher = METHOD_PATTERN.matcher(sentence);
 
         if (!matcher.find()) {
-            throw new IllegalArgumentException("올바르지 않은 값입니다. : " + sentence);
+            throw new IllegalArgumentException("Wrong value:" + sentence);
         }
 
         String onStartMethodName = matcher.group();
